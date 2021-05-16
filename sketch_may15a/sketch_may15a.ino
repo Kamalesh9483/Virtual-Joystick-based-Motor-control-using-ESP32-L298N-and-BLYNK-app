@@ -1,4 +1,4 @@
-#include <analogWrite.h>
+
 #define BLYNK_PRINT Serial
 #include <WiFi.h>
 #include <WiFiClient.h>
@@ -25,6 +25,20 @@ const int IN3 = 27;
 const int IN4 = 14;
 const int ENB = 12;
 
+// setting PWM properties for motorA
+const int freq_1 = 5000;
+const int ledChannel_1 = 0;
+const int resolution_1 = 8;
+
+// setting PWM properties for motorB
+const int freq_2 = 5000;
+const int ledChannel_2 = 1;
+const int resolution_2 = 8;
+
+
+
+
+
 // Function for Motor Control
 void motorControl(int x, int y){
 int motorSpeed1 = 0;
@@ -40,8 +54,8 @@ int motorSpeed2 = 0;
   
     motorSpeed1 = map(y, 522, 1023, 0, 255);
     motorSpeed2 = map(y, 522, 1023, 0, 255);
-    analogWrite(ENA, motorSpeed1);
-    analogWrite(ENB, motorSpeed2);
+    ledcWrite(ledChannel_1, motorSpeed1);
+    ledcWrite(ledChannel_2, motorSpeed2);
   }
 
 // Backward
@@ -54,16 +68,16 @@ int motorSpeed2 = 0;
   
     motorSpeed1 = map(y, 502, 0, 0, 255);
     motorSpeed2 = map(y, 502, 0, 0, 255);  
-    analogWrite(ENA, motorSpeed1);
-    analogWrite(ENB, motorSpeed2);  
+    ledcWrite(ledChannel_1, motorSpeed1);
+    ledcWrite(ledChannel_2, motorSpeed2);
   }
 
 // stop if forward and backward condition is not satisfied 
   else{
     motorSpeed1 = 0;
     motorSpeed2 = 0;
-    analogWrite(ENA, motorSpeed1);
-    analogWrite(ENB, motorSpeed2);
+    ledcWrite(ledChannel_1, motorSpeed1);
+    ledcWrite(ledChannel_2, motorSpeed2);
   }
   
 
@@ -77,8 +91,8 @@ int motorSpeed2 = 0;
       motorSpeed1 = 0;}
     if (motorSpeed2 > 255){
       motorSpeed2 = 255;}
-    analogWrite(ENA, motorSpeed1);
-    analogWrite(ENB, motorSpeed2);  
+    ledcWrite(ledChannel_1, motorSpeed1);
+    ledcWrite(ledChannel_2, motorSpeed2);
   }
 
 // Right
@@ -90,10 +104,11 @@ int motorSpeed2 = 0;
       motorSpeed1 = 255;}
     if (motorSpeed2 < 0){
       motorSpeed2 = 0;}
-      analogWrite(ENA, motorSpeed1);
-      analogWrite(ENB, motorSpeed2);
+    ledcWrite(ledChannel_1, motorSpeed1);
+    ledcWrite(ledChannel_2, motorSpeed2);
      }
 }
+
 
 void setup()
 {
@@ -121,6 +136,18 @@ void setup()
   pinMode(IN3,OUTPUT);
   pinMode(IN4,OUTPUT);
   pinMode(ENB,OUTPUT);
+
+ // configuring PWM functionalitites of Motor A
+  ledcSetup(ledChannel_1, freq_1, resolution_1);
+  
+  // Channel of the GPIO to be controlled for Motor A
+  ledcAttachPin(ENA, ledChannel_1);
+
+ // configuring PWM functionalitites of Motor B
+  ledcSetup(ledChannel_2, freq_2, resolution_2);
+  
+  // Channel of the GPIO to be controlled for Motor B
+  ledcAttachPin(ENB, ledChannel_2); 
 }
 
 void loop()
